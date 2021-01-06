@@ -3,5 +3,6 @@
 
 OPTIONS=(-r power)
 PANELS=(
+	[truly_otm1288a_720p_cmd]="longcheer,truly-otm1288a"
 	[yushun_nt35520_720p_cmd]="longcheer,yushun-nt35520"
 )
