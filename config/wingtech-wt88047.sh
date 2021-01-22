@@ -6,4 +6,5 @@ OPTIONS=(-r power)
 PANELS=(
 	[otm1285a_otp_720p_video]="wingtech,ebbg-otm1285a"
 	[r61308_720p_video]="wingtech,auo-r61308"
+	[r69431_720p_video]="wingtech,sharp-r69431"
 )
