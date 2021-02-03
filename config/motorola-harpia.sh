@@ -3,5 +3,6 @@
 
 OPTIONS=(-r vsp -r vsn --backlight-gpio --dcs-no-get-brightness)
 PANELS=(
+	[boe_499_720p_video_v1]="motorola,harpia-panel-boe"
 	[tianma_499_720p_video_v2]="motorola,harpia-panel-tianma"
 )
