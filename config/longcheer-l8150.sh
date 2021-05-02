@@ -4,4 +4,5 @@
 OPTIONS=(-r power --dumb-dcs --ignore-wait 1)
 PANELS=(
 	[booyi_otm1287_720p_video]="longcheer,booyi-otm1287"
+	[dijing_ili9881c_720p_video]="longcheer,dijing-ili9881c"
 )
