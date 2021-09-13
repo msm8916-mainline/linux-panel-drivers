@@ -7,6 +7,9 @@ REPOSITORY="msm8916-mainline/linux-panel-drivers"
 KCONFIG="CONFIG_DRM_PANEL_${PROJECT^^}_GENERATED"
 GENERATOR="linux-mdss-dsi-panel-driver-generator"
 
+# Unset some variables that git sets while in rebase session
+unset "${!GIT_@}"
+
 export GIT_AUTHOR_NAME="lmdpdg"
 export GIT_AUTHOR_EMAIL="<>"
 
