@@ -11,7 +11,7 @@ GENERATOR="linux-mdss-dsi-panel-driver-generator"
 unset "${!GIT_@}"
 
 export GIT_AUTHOR_NAME="lmdpdg"
-export GIT_AUTHOR_EMAIL="<>"
+export GIT_AUTHOR_EMAIL="<lmdpdg@localhost>"
 
 KERNEL_DIR="$PWD"
 BASE_DIR=$(dirname "$(readlink -f "$0")")
@@ -98,7 +98,8 @@ fi
 
 commit_message="$squash${PROJECT^^}: drm/panel: Generate using $GENERATOR
 
-From: $REPOSITORY@$(git -C "$BASE_DIR" describe --always --dirty=' (dirty)')"
+X-Code-Generator: $REPOSITORY@$(git -C "$BASE_DIR" describe --always --dirty=' (dirty)')
+Signed-off-by: $GIT_AUTHOR_NAME $GIT_AUTHOR_EMAIL"
 
 cp "$OUT_DIR"/Makefile "$PROJECT-generated/"
 cp "${new_panel_drivers[@]}" "$PROJECT-generated/"
