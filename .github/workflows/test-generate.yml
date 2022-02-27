@@ -1,0 +1,29 @@
+name: Try to generate the panels
+on: [push, pull_request]
+jobs:
+  test-generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Install dependencies
+        run: |
+          git clone --depth=1 https://github.com/dgibson/dtc.git
+          make -C dtc NO_PYTHON=1
+          sudo make -C dtc install
+          pip install ./dtc --user
+      - name: Clone Linux kernel tree
+        run: |
+          git clone --depth=1 https://github.com/torvalds/linux.git
+      - name: Try to geenrate the panels
+        run: |
+          git config --global user.email "ci@localhost"
+          git config --global user.name "ci"
+          cd linux
+          ../generate.sh
+      - name: Show the generated commit
+        run: |
+          git -C linux show HEAD
+
