@@ -20,6 +20,17 @@ LMDPDG_DIR="$BASE_DIR/$GENERATOR"
 
 declare -a OPTIONS
 declare -A PANELS
+declare -a kconfig_lines
+
+KCONFIG_HEAD="\
+menu \"MSM8916 panel drivers generated with $GENERATOR\"
+	depends on GPIOLIB && OF && REGULATOR
+	depends on DRM_MIPI_DSI
+
+config ${KCONFIG#CONFIG_}
+	tristate \"Select all generated ${PROJECT^^} panel drivers by default\"
+"
+KCONFIG_PANEL="	default ${KCONFIG#CONFIG_}\n"
 
 echo "Generating panel drivers..."
 rm -rf "$OUT_DIR"
@@ -38,17 +49,26 @@ for CONFIG in *.sh; do
 
 	for panel in "${!PANELS[@]}"; do
 		compatible="${PANELS[$panel]}"
-		driver="${compatible/,/-}"
-		driver="panel-${driver/-panel/}"
-
-		echo "obj-\$($KCONFIG) += $driver.o" >> "$OUT_DIR/Makefile"
+		panel_id="${compatible/-panel-/-}"
+		vendor="${panel_id%%,*}"
+		name="${panel_id##*,}"
+		name="${name//-/ }"
+		name="${vendor^} ${name^^}"
+		kconfig="CONFIG_DRM_PANEL_${panel_id//[,-]/_}"
+		kconfig="${kconfig^^}"
+		driver="panel-${panel_id/,/-}"
+		kconfig_lines+=("config ${kconfig#CONFIG_}\n	tristate \"$name\"\n$KCONFIG_PANEL")
+		echo "obj-\$($kconfig) += $driver.o" >> "$OUT_DIR/Makefile"
 		cp "$panel"/panel-!(simple-*).c "$OUT_DIR/$driver.c"
 		sed -Ei "s/\.compatible = \".+\"/.compatible = \"$compatible\"/g" "$OUT_DIR/$driver.c"
 	done
 done
-
 new_panel_drivers=("$OUT_DIR"/panel-*.c)
 sort -o "$OUT_DIR/Makefile" "$OUT_DIR/Makefile"
+
+echo "$KCONFIG_HEAD" > "$OUT_DIR/Kconfig"
+echo -e "$(IFS=$'\n'; sort <<< "${kconfig_lines[*]}")" >> "$OUT_DIR/Kconfig"
+echo "endmenu" >> "$OUT_DIR/Kconfig"
 
 echo "Checking kernel source tree (run script from root directory of kernel tree)..."
 cd "$KERNEL_DIR/drivers/gpu/drm/panel"
@@ -58,12 +78,6 @@ if output=$(git status --porcelain -- .) && [ -n "$output" ]; then
 	echo "$output"
 	exit 1
 fi
-
-KCONFIG_HELP="
-config ${KCONFIG#CONFIG_}
-	tristate \"MSM8916 panel drivers generated with $GENERATOR\"
-	depends on GPIOLIB && OF && REGULATOR
-	depends on DRM_MIPI_DSI"
 
 squash=""
 if [ -d "$PROJECT-generated" ]; then
@@ -91,8 +105,8 @@ if [ -d "$PROJECT-generated" ]; then
 		new_panel_drivers+=("$driver_path")
 	done
 else
-	echo "obj-\$($KCONFIG) += $PROJECT-generated/" >> Makefile
-	sed -i "/^endmenu/i \\${KCONFIG_HELP//$'\n'/\\n}" Kconfig
+	echo "obj-y += $PROJECT-generated/" >> Makefile
+	sed -i "/^endmenu/i source \"drivers/gpu/drm/panel/$PROJECT-generated/Kconfig\"" Kconfig
 	mkdir "$PROJECT-generated"
 fi
 
@@ -101,7 +115,7 @@ commit_message="$squash${PROJECT^^}: drm/panel: Generate using $GENERATOR
 X-Code-Generator: $REPOSITORY@$(git -C "$BASE_DIR" describe --always --dirty=' (dirty)')
 Signed-off-by: $GIT_AUTHOR_NAME $GIT_AUTHOR_EMAIL"
 
-cp "$OUT_DIR"/Makefile "$PROJECT-generated/"
+cp "$OUT_DIR"/{Kconfig,Makefile} "$PROJECT-generated/"
 cp "${new_panel_drivers[@]}" "$PROJECT-generated/"
 git add "$PROJECT-generated"
 git commit -qm "$commit_message" -- .
