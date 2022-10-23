@@ -4,4 +4,5 @@
 OPTIONS=(-r vsp -r vsn --dumb-dcs)
 PANELS=(
 	[ili9881_720p_video]="wingtech,yassy-ili9881"
+	[ili9881_qimei_720p_video]="wingtech,qimei-ili9881"
 )
