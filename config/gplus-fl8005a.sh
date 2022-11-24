@@ -3,5 +3,5 @@
 
 OPTIONS=(-r power --dumb-dcs)
 PANELS=(
-	[hx8394d_800p_video]="gplus,hx8394d"
+	[hx8394d_800p_video]="gplus,fl8005a-hx8394d"
 )
