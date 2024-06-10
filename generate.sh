@@ -61,6 +61,7 @@ for CONFIG in *.sh; do
 		echo "obj-\$($kconfig) += $driver.o" >> "$OUT_DIR/Makefile"
 		cp "$panel"/panel-!(simple-*).c "$OUT_DIR/$driver.c"
 		sed -Ei "s/\.compatible = \".+\"/.compatible = \"$compatible\"/g" "$OUT_DIR/$driver.c"
+		sed -Ei "s/\.name = \".+\"/.name = \"$driver\"/g" "$OUT_DIR/$driver.c"
 	done
 done
 new_panel_drivers=("$OUT_DIR"/panel-*.c)
