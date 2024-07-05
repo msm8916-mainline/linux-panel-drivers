@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# DTB: Extracted from Asop Extended DT
+# DTB: From AospExtended-v7.2-A6020-20200513-2005-OFFICIAL.zip
 
 OPTIONS=(-r vsp -r vsn)
 PANELS=(
